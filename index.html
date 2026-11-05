@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسبیح دیجیتال</title>
+    <title>تسبیح</title>
     <style>
         body {
             font-family: 'Tahoma', 'Arial', sans-serif;
@@ -15,38 +15,44 @@
             margin: 0;
             color: #333;
         }
-
         .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             text-align: center;
-            width: 300px;
-            border: 5px solid #2c3e50;
+            width: 350px;
+            border: 2px solid #1a5f7a;
         }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        #counter {
-            font-size: 60px;
-            font-weight: bold;
-            color: #1a5f7a;
-            margin: 20px 0;
-            display: block;
-        }
-
-        .buttons {
+        h1 { color: #1a5f7a; margin-bottom: 20px; }
+        
+        /* تب بندی */
+        .tabs {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
         }
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #777;
+        }
+        .tab.active {
+            color: #1a5f7a;
+            border-bottom: 3px solid #1a5f7a;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
+        /* استایل‌های تسبیح */
+        .counter-display {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #1a5f7a;
+        }
         .btn-count {
             width: 120px;
             height: 120px;
@@ -57,69 +63,125 @@
             font-size: 20px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(26, 95, 122, 0.4);
-            transition: transform 0.1s, background-color 0.3s;
+            transition: 0.2s;
         }
-
-        .btn-count:active {
-            transform: scale(0.95);
-            background-color: #134a61;
+        .btn-count:active { transform: scale(0.95); }
+        
+        select, input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
         }
-
         .btn-reset {
-            padding: 10px 25px;
-            border-radius: 10px;
-            border: none;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn-reset:hover {
-            background-color: #c0392b;
-        }
-
-        .footer-text {
             margin-top: 20px;
+            padding: 8px 20px;
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer-link {
+            margin-top: 25px;
             font-size: 14px;
-            color: #7f8c8d;
+        }
+        .footer-link a {
+            color: #1a5f7a;
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>تسبیح دیجیتال</h1>
-        
-        <span id="counter">0</span>
+<div class="container">
+    <h1>تسبیح</h1>
 
-        <div class="buttons">
-            <button class="btn-count" onclick="increment()">ذکر</button>
-            <button class="btn-reset" onclick="resetCounter()">صفر کردن</button>
-        </div>
-
-        <div class="footer-text">
-            یا علی (ع)
-        </div>
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(event, 'main')">تسبیح</div>
+        <div class="tab" onclick="openTab(event, 'settings')">تنظیمات</div>
     </div>
 
-    <script>
-        let count = 0;
-        const counterDisplay = document.getElementById('counter');
+    <!-- تب اصلی -->
+    <div id="main" class="tab-content active">
+        <div id="current-zikr-text" style="font-weight: bold; font-size: 18px; color: #555;">سبحان‌الله</div>
+        <div class="counter-display" id="counter">0</div>
+        <button class="btn-count" onclick="increment()">ذکر</button>
+        <div style="margin-top: 10px; font-size: 14px;">هدف: <span id="goal-text">100</span></div>
+    </div>
 
-        function increment() {
-            count++;
-            counterDisplay.innerText = count;
+    <!-- تب تنظیمات -->
+    <div id="settings" class="tab-content">
+        <label>انتخاب ذکر:</label>
+        <select id="zikr-select" onchange="updateZikr()">
+            <option value="سبحان‌الله">سبحان‌الله</option>
+            <option value="الحمدلله">الحمدلله</option>
+            <option value="الله‌اکبر">الله‌اکبر</option>
+            <option value="استغفرالله">استغفرالله</option>
+            <option value="صلاوات">صلاوات</option>
+            <option value="یا علی (ع)">یا علی (ع)</option>
+        </select>
+        
+        <label>تعیین هدف (تعداد):</label>
+        <input type="number" id="goal-input" value="100" onchange="updateGoal()">
+        
+        <br>
+        <button class="btn-reset" onclick="resetCounter()">صفر کردن تسبیح</button>
+    </div>
+
+    <div class="footer-link">
+        کانال <a href="https://eitaa.com/montazeran_vaede_elahi" target="_blank">منتظران وعده الهی در ایتا</a>
+    </div>
+</div>
+
+<script>
+    let count = 0;
+    let goal = 100;
+
+    function increment() {
+        count++;
+        document.getElementById('counter').innerText = count;
+        if (count === goal) {
+            alert("آفرین! به هدف خود رسیدید. 🌸");
         }
+    }
 
-        function resetCounter() {
-            if (confirm("آیا مطمئن هستید که می‌خواهید تعداد ذکرها صفر شود؟")) {
-                count = 0;
-                counterDisplay.innerText = count;
-            }
+    function resetCounter() {
+        if (confirm("آیا مطمئن هستید که می‌خواهید تعداد ذکرها صفر شود؟")) {
+            count = 0;
+            document.getElementById('counter').innerText = count;
         }
-    </script>
+    }
 
+    function updateZikr() {
+        const selectedZikr = document.getElementById('zikr-select').value;
+        document.getElementById('current-zikr-text').innerText = selectedZikr;
+    }
+
+    function updateGoal() {
+        goal = document.getElementById('goal-input').value;
+        document.getElementById('goal-text').innerText = goal;
+    }
+
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.className += " active";
+    }
+</script>
+    
 </body>
 </html>
